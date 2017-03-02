@@ -4,13 +4,9 @@ package com.example.admin.codestrike;
  * Created by admin on 01/03/2017.
  */
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.Window;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -41,6 +37,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         //initializing firebase authentication object
         firebaseAuth = FirebaseAuth.getInstance();
@@ -71,7 +68,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
 
         //adding listener to button
-        buttonLogout.setOnClickListener(this);
+        buttonSave.setOnClickListener(this);
     }
     private void saveUserInformation() {
         //Getting values from database
@@ -79,13 +76,16 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         String add = editTextAddress.getText().toString().trim();
 
         //creating a userinformation object
-        UserInformation userInformation = new UserInformation(name, add);
+        UserInformation userInformation = new UserInformation();
+        userInformation.setName(name);
+        userInformation.setAddress(add);
 
         //getting the current logged in user
         FirebaseUser user = firebaseAuth.getCurrentUser();
+        userInformation.setuid(databaseReference.child("students").push().getKey());
 
 
-        databaseReference.child(user.getUid()).setValue(userInformation);
+        databaseReference.child("students").child(userInformation.getUid()).setValue(userInformation);
 
         //displaying a success toast
         Toast.makeText(this, "Information Saved...", Toast.LENGTH_LONG).show();
@@ -107,4 +107,5 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 }
+
 
